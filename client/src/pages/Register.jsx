@@ -18,3 +18,4 @@ const Register = () => {
 }
 
 export default Register
+export const ReactQuill = typeof window === 'object' ? require('react-quill') : () => null;
