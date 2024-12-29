@@ -1,51 +1,61 @@
-import React from 'react'
-import Edit from "../img/edit.webp"
-import Delete from "../img/delete.webp"
-import { Link } from 'react-router-dom'
-import Menu from '../components/Menu'
+import React, { useContext, useEffect, useState } from "react";
+import Edit from "../img/edit.webp";
+import Delete from "../img/delete.webp";
+import { Link, useLocation } from "react-router-dom";
+import Menu from "../components/Menu";
+import axios from "axios";
+import moment from "moment";
+import { AuthContext } from "../context/authContext";
 
 const Single = () => {
+  const [post, setPost] = useState({});
+
+  const location = useLocation();
+
+  const postId = location.pathname.split("/")[2];
+
+  const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`/posts/${postId}`);
+        setPost(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, [postId]);
+
   return (
-    <div className='single'>
+    <div className="single">
       <div className="content">
-        <img src="https://i.kym-cdn.com/photos/images/original/000/665/377/0bf.jpg" alt="" />
+        <img src={post.img} alt="" />
         <div className="user">
-          <img src="https://i.kym-cdn.com/photos/images/original/000/665/377/0bf.jpg" alt="" />
+          <img
+            src="https://i.kym-cdn.com/photos/images/original/000/665/377/0bf.jpg"
+            alt=""
+          />
           <div className="info">
-            <span>John</span>
-            <p>Posted 2 days ago</p>
+            <span>{post.username}</span>
+            <p>Posted {moment(post.date).fromNow()}</p>
           </div>
-          <div className="edit">
-            <Link to={`/write?edit=2`}>
-              <img src={Edit} alt="" />
-            </Link>
-            <img src={Delete} alt="" />
-          </div>
+          {currentUser.username === post.username && (
+            <div className="edit">
+              <Link to={`/write?edit=2`}>
+                <img src={Edit} alt="" />
+              </Link>
+              <img src={Delete} alt="" />
+            </div>
+          )}
         </div>
-        <h1>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente!</h1>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt nihil expedita fugiat aut doloribus molestiae officia distinctio, alias repellendus vero.
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt nihil expedita fugiat aut doloribus molestiae officia distinctio, alias repellendus vero.
-          <br />
-          <br />
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-          <br />
-          <br />
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-          <br />
-          <br />
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Mollitia nemo libero consequuntur natus ad commodi nulla ratione aliquam tempora excepturi.
-        </p>
+        <h1>{post.title}</h1>
+        {post.desc}
       </div>
       <Menu />
     </div>
-  )
-}
+  );
+};
 
-export default Single
+export default Single;
